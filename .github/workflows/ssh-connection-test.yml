@@ -37,6 +37,8 @@ jobs:
           chmod 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/github_tarot_deploy
           chmod 600 ~/.ssh/github_tarot_deploy
+          echo "Private key fingerprint used by GitHub Actions:"
+          ssh-keygen -lf ~/.ssh/github_tarot_deploy -E sha256
           ssh-keyscan -p "$PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 

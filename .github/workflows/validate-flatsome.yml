@@ -1,0 +1,33 @@
+name: Validate Flatsome Tarot stack
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "themes/tarot-goi-mo-flatsome-child/**"
+      - "plugins/tarot-goi-mo-core/**"
+      - ".github/workflows/validate-flatsome.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate PHP syntax
+        run: |
+          find themes/tarot-goi-mo-flatsome-child plugins/tarot-goi-mo-core -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Verify child theme parent
+        run: |
+          grep -q "Template: flatsome" themes/tarot-goi-mo-flatsome-child/style.css
+
+      - name: Verify required Tarot shortcodes
+        run: |
+          grep -q "tarot_goi_mo_draw" plugins/tarot-goi-mo-core/tarot-goi-mo-core.php
+          grep -q "tarot_goi_mo_arcana" plugins/tarot-goi-mo-core/tarot-goi-mo-core.php

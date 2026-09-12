@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Validate PHP syntax
         run: |
@@ -52,7 +52,7 @@ jobs:
 
       - name: Checkout
         if: steps.config.outputs.enabled == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install lftp
         if: steps.config.outputs.enabled == 'true'
@@ -82,6 +82,6 @@ jobs:
             set ftp:ssl-protect-data true;
             set ssl:verify-certificate yes;
             set net:max-retries 2;
-            mirror -R --delete --verbose themes/tarot-goi-mo/ /;
+            mirror -R --delete --verbose --exclude-glob .ftpquota themes/tarot-goi-mo/ /;
             bye
           "

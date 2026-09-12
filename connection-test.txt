@@ -1,0 +1,4 @@
+Tarot Goi Mo - GitHub connection test
+Status: WRITE_OK
+Date: 2026-09-12
+Purpose: Verify ChatGPT Codex Connector read/write access before building the WordPress theme.

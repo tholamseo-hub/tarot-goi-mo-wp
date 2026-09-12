@@ -1,0 +1,55 @@
+name: SSH connection test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ssh-connection-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_PATH: ${{ secrets.SSH_PATH }}
+    steps:
+      - name: Check secrets
+        shell: bash
+        run: |
+          test -n "$SSH_HOST"
+          test -n "$SSH_USERNAME"
+          test -n "$SSH_PRIVATE_KEY"
+          test -n "$SSH_PATH"
+          echo "Required SSH secrets are present."
+
+      - name: Configure SSH key
+        shell: bash
+        run: |
+          PORT="${SSH_PORT:-22}"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/github_tarot_deploy
+          chmod 600 ~/.ssh/github_tarot_deploy
+          ssh-keyscan -p "$PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Test SSH login
+        shell: bash
+        run: |
+          PORT="${SSH_PORT:-22}"
+          ssh -i ~/.ssh/github_tarot_deploy -p "$PORT" -o BatchMode=yes "$SSH_USERNAME@$SSH_HOST" "echo SSH_LOGIN_OK"
+
+      - name: Verify WordPress themes directory
+        shell: bash
+        run: |
+          PORT="${SSH_PORT:-22}"
+          TARGET="${SSH_PATH%/}"
+          PARENT="$(dirname "$TARGET")"
+          ssh -i ~/.ssh/github_tarot_deploy -p "$PORT" -o BatchMode=yes "$SSH_USERNAME@$SSH_HOST" "test -d '$PARENT' && test -w '$PARENT' && echo WORDPRESS_THEMES_DIR_OK"

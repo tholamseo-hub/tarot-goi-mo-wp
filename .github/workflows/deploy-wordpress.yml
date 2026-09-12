@@ -34,39 +34,52 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     env:
-      SFTP_HOST: ${{ secrets.SFTP_HOST }}
-      SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-      SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-      SFTP_PORT: ${{ secrets.SFTP_PORT }}
-      SFTP_PATH: ${{ secrets.SFTP_PATH }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_PATH: ${{ secrets.SSH_PATH }}
     steps:
       - name: Check deployment configuration
         id: config
         shell: bash
         run: |
-          if [[ -n "$SFTP_HOST" && -n "$SFTP_USERNAME" && -n "$SFTP_PASSWORD" && -n "$SFTP_PATH" ]]; then
+          if [[ -n "$SSH_HOST" && -n "$SSH_USERNAME" && -n "$SSH_PRIVATE_KEY" && -n "$SSH_PATH" ]]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "SFTP secrets are not configured yet. Validation passed; deployment intentionally skipped."
+            echo "SSH deployment secrets are not configured yet. Validation passed; deployment intentionally skipped."
           fi
 
       - name: Checkout
         if: steps.config.outputs.enabled == 'true'
         uses: actions/checkout@v4
 
-      - name: Install lftp
-        if: steps.config.outputs.enabled == 'true'
-        run: sudo apt-get update && sudo apt-get install -y lftp
-
-      - name: Deploy theme over SFTP
+      - name: Configure SSH key
         if: steps.config.outputs.enabled == 'true'
         shell: bash
         run: |
-          PORT="${SFTP_PORT:-22}"
-          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -p "$PORT" "sftp://$SFTP_HOST" -e "
-            set sftp:auto-confirm yes;
-            set net:max-retries 2;
-            mirror -R --delete --verbose themes/tarot-goi-mo/ \"$SFTP_PATH\";
-            bye
-          "
+          PORT="${SSH_PORT:-22}"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/github_tarot_deploy
+          chmod 600 ~/.ssh/github_tarot_deploy
+          ssh-keyscan -p "$PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          PORT="${SSH_PORT:-22}"
+          ssh -i ~/.ssh/github_tarot_deploy -p "$PORT" -o BatchMode=yes "$SSH_USERNAME@$SSH_HOST" "echo 'SSH connection OK'"
+
+      - name: Deploy theme over SSH
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          PORT="${SSH_PORT:-22}"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/github_tarot_deploy -p $PORT" \
+            themes/tarot-goi-mo/ \
+            "$SSH_USERNAME@$SSH_HOST:$SSH_PATH"

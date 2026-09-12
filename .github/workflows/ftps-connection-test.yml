@@ -31,6 +31,14 @@ jobs:
             echo "FTPS secrets are not configured yet; connection test skipped."
           fi
 
+      - name: Inspect FTPS certificate hostname
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          PORT="${FTP_PORT:-21}"
+          echo | openssl s_client -starttls ftp -connect "$FTP_HOST:$PORT" -servername "$FTP_HOST" 2>/dev/null \
+            | openssl x509 -noout -subject -issuer -ext subjectAltName
+
       - name: Install lftp
         if: steps.config.outputs.enabled == 'true'
         run: sudo apt-get update && sudo apt-get install -y lftp

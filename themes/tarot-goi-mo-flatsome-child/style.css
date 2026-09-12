@@ -1,0 +1,25 @@
+/*
+Theme Name: Tarot Gợi Mở — Flatsome Child
+Theme URI: https://github.com/tholamseo-hub/tarot-goi-mo-wp
+Description: Child theme dành cho Tarot Gợi Mở, kế thừa Flatsome để có thể chỉnh trang bằng UX Builder.
+Author: Tarot Gợi Mở
+Template: flatsome
+Version: 0.1.0
+Text Domain: tarot-goi-mo-flatsome-child
+*/
+
+:root {
+  --tgm-bg: #0b090d;
+  --tgm-panel: #1b141c;
+  --tgm-text: #f2eadf;
+  --tgm-muted: #b9ac9c;
+  --tgm-gold: #c6a15b;
+  --tgm-gold-2: #e5c77e;
+  --tgm-line: rgba(198, 161, 91, .28);
+}
+
+/*
+ * Giữ child theme thật mỏng.
+ * Bố cục trang, section, banner, heading, spacing... nên chỉnh bằng Flatsome UX Builder.
+ * Giao diện widget Tarot nằm trong plugin Tarot Gợi Mở Core và dùng các biến màu ở trên.
+ */

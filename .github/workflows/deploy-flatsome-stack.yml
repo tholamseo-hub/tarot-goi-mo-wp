@@ -1,0 +1,73 @@
+name: Deploy Flatsome Tarot stack
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "themes/tarot-goi-mo-flatsome-child/**"
+      - "plugins/tarot-goi-mo-core/**"
+      - ".github/workflows/deploy-flatsome-stack.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tarot-goi-mo-flatsome-production
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate PHP syntax
+        run: |
+          find themes/tarot-goi-mo-flatsome-child plugins/tarot-goi-mo-core -name "*.php" -print0 | xargs -0 -n1 php -l
+      - name: Verify Flatsome parent declaration
+        run: grep -q "Template: flatsome" themes/tarot-goi-mo-flatsome-child/style.css
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      FTP_HOST: ${{ secrets.FLATSOME_FTP_HOST }}
+      FTP_USERNAME: ${{ secrets.FLATSOME_FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FLATSOME_FTP_PASSWORD }}
+      FTP_PORT: ${{ secrets.FLATSOME_FTP_PORT }}
+    steps:
+      - name: Check deployment configuration
+        id: config
+        shell: bash
+        run: |
+          if [[ -n "$FTP_HOST" && -n "$FTP_USERNAME" && -n "$FTP_PASSWORD" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Flatsome deploy secrets are not configured yet; deployment skipped safely."
+          fi
+
+      - name: Checkout
+        if: steps.config.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        if: steps.config.outputs.enabled == 'true'
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Deploy child theme and plugin over explicit FTPS
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          PORT="${FTP_PORT:-21}"
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$PORT" "ftp://$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate yes;
+            set net:max-retries 2;
+            mkdir -p /themes/tarot-goi-mo-flatsome-child;
+            mkdir -p /plugins/tarot-goi-mo-core;
+            mirror -R --delete --verbose themes/tarot-goi-mo-flatsome-child/ /themes/tarot-goi-mo-flatsome-child/;
+            mirror -R --delete --verbose plugins/tarot-goi-mo-core/ /plugins/tarot-goi-mo-core/;
+            bye
+          "

@@ -1,0 +1,51 @@
+name: FTPS connection test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ftps-connection-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-ftps:
+    runs-on: ubuntu-latest
+    env:
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      FTP_PORT: ${{ secrets.FTP_PORT }}
+    steps:
+      - name: Check FTPS secrets
+        id: config
+        shell: bash
+        run: |
+          if [[ -n "$FTP_HOST" && -n "$FTP_USERNAME" && -n "$FTP_PASSWORD" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "FTPS secrets are present."
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "FTPS secrets are not configured yet; connection test skipped."
+          fi
+
+      - name: Install lftp
+        if: steps.config.outputs.enabled == 'true'
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Test explicit FTPS login and list account root
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          PORT="${FTP_PORT:-21}"
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$PORT" "ftp://$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate yes;
+            set net:max-retries 2;
+            pwd;
+            cls -la;
+            bye
+          "

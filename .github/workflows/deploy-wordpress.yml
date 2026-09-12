@@ -1,0 +1,72 @@
+name: Validate and deploy Tarot Goi Mo theme
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "themes/tarot-goi-mo/**"
+      - ".github/workflows/deploy-wordpress.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tarot-goi-mo-production
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate PHP syntax
+        run: |
+          find themes/tarot-goi-mo -name "*.php" -print0 | xargs -0 -n1 php -l
+
+      - name: Validate Major Arcana count
+        run: |
+          php -r '$cards = include "themes/tarot-goi-mo/assets/data/major-arcana.php"; if (count($cards) !== 22) { fwrite(STDERR, "Expected 22 cards, got ".count($cards).PHP_EOL); exit(1); } echo "Major Arcana data OK: 22 cards".PHP_EOL;'
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      SFTP_HOST: ${{ secrets.SFTP_HOST }}
+      SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+      SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+      SFTP_PORT: ${{ secrets.SFTP_PORT }}
+      SFTP_PATH: ${{ secrets.SFTP_PATH }}
+    steps:
+      - name: Check deployment configuration
+        id: config
+        shell: bash
+        run: |
+          if [[ -n "$SFTP_HOST" && -n "$SFTP_USERNAME" && -n "$SFTP_PASSWORD" && -n "$SFTP_PATH" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "SFTP secrets are not configured yet. Validation passed; deployment intentionally skipped."
+          fi
+
+      - name: Checkout
+        if: steps.config.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        if: steps.config.outputs.enabled == 'true'
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Deploy theme over SFTP
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          PORT="${SFTP_PORT:-22}"
+          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -p "$PORT" "sftp://$SFTP_HOST" -e "
+            set sftp:auto-confirm yes;
+            set net:max-retries 2;
+            mirror -R --delete --verbose themes/tarot-goi-mo/ \"$SFTP_PATH\";
+            bye
+          "

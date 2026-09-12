@@ -34,52 +34,54 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     env:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      SSH_PORT: ${{ secrets.SSH_PORT }}
-      SSH_PATH: ${{ secrets.SSH_PATH }}
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      FTP_PORT: ${{ secrets.FTP_PORT }}
     steps:
       - name: Check deployment configuration
         id: config
         shell: bash
         run: |
-          if [[ -n "$SSH_HOST" && -n "$SSH_USERNAME" && -n "$SSH_PRIVATE_KEY" && -n "$SSH_PATH" ]]; then
+          if [[ -n "$FTP_HOST" && -n "$FTP_USERNAME" && -n "$FTP_PASSWORD" ]]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "SSH deployment secrets are not configured yet. Validation passed; deployment intentionally skipped."
+            echo "FTPS deployment secrets are not configured yet. Validation passed; deployment intentionally skipped."
           fi
 
       - name: Checkout
         if: steps.config.outputs.enabled == 'true'
         uses: actions/checkout@v4
 
-      - name: Configure SSH key
+      - name: Install lftp
         if: steps.config.outputs.enabled == 'true'
-        shell: bash
-        run: |
-          PORT="${SSH_PORT:-22}"
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/github_tarot_deploy
-          chmod 600 ~/.ssh/github_tarot_deploy
-          ssh-keyscan -p "$PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+        run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Test SSH connection
+      - name: Test explicit FTPS connection
         if: steps.config.outputs.enabled == 'true'
         shell: bash
         run: |
-          PORT="${SSH_PORT:-22}"
-          ssh -i ~/.ssh/github_tarot_deploy -p "$PORT" -o BatchMode=yes "$SSH_USERNAME@$SSH_HOST" "echo 'SSH connection OK'"
+          PORT="${FTP_PORT:-21}"
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$PORT" "ftp://$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate yes;
+            set net:max-retries 2;
+            cls -la;
+            bye
+          "
 
-      - name: Deploy theme over SSH
+      - name: Deploy theme over explicit FTPS
         if: steps.config.outputs.enabled == 'true'
         shell: bash
         run: |
-          PORT="${SSH_PORT:-22}"
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/github_tarot_deploy -p $PORT" \
-            themes/tarot-goi-mo/ \
-            "$SSH_USERNAME@$SSH_HOST:$SSH_PATH"
+          PORT="${FTP_PORT:-21}"
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$PORT" "ftp://$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate yes;
+            set net:max-retries 2;
+            mirror -R --delete --verbose themes/tarot-goi-mo/ /;
+            bye
+          "

@@ -32,7 +32,11 @@ function tarot_goi_mo_cards(): array {
 
 function tarot_goi_mo_assets(): void {
     $version = wp_get_theme()->get('Version');
+    $refine_path = get_template_directory() . '/assets/css/refine.css';
+    $refine_version = file_exists($refine_path) ? (string) filemtime($refine_path) : $version;
+
     wp_enqueue_style('tarot-goi-mo', get_stylesheet_uri(), array(), $version);
+    wp_enqueue_style('tarot-goi-mo-refine', get_template_directory_uri() . '/assets/css/refine.css', array('tarot-goi-mo'), $refine_version);
     wp_enqueue_script('tarot-goi-mo', get_template_directory_uri() . '/assets/js/tarot.js', array(), $version, true);
     wp_localize_script('tarot-goi-mo', 'TarotGoiMo', array(
         'cards' => tarot_goi_mo_cards(),

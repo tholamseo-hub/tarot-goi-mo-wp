@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17152b">
+  <meta name="description" content="Demo web Tarot tương tác: đặt câu hỏi, tự chọn ba lá bài, xem diễn giải và khám phá lịch Reader mẫu.">
+  <title>Moonlit Tarot — Một khoảng lặng để lắng nghe</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="site-glow" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#dau-trang" aria-label="Moonlit Tarot, về đầu trang"><span class="brand-symbol" aria-hidden="true">✦</span><span>moonlit<span class="brand-dot">.</span><small>TAROT STUDIO</small></span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Mở menu"><span></span><span></span><span></span></button>
+      <nav class="nav" id="primary-nav" aria-label="Điều hướng chính">
+        <a href="#trai-bai">Trải bài</a><a href="#tinh-nang">Trải nghiệm</a><a href="#reader">Reader</a><a href="#cach-dung">Cách sử dụng</a><a href="#faq">FAQ</a>
+        <a class="nav-cta" href="#trai-bai">Bắt đầu miễn phí <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="dau-trang">
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-star">✳</span> KHÔNG GIAN LẮNG NGHE & CHIÊM NGHIỆM <span class="eyebrow-line"></span></div>
+        <h1 id="hero-title">Một câu hỏi nhỏ.<br>Một góc nhìn <em>mới.</em></h1>
+        <p class="hero-desc">Không cần đoán trước ngày mai. Hãy để những lá bài gợi mở điều bạn đang nghĩ, theo cách riêng của bạn.</p>
+        <div class="hero-actions"><a href="#trai-bai" class="btn btn-gold">✦ Trải bài ngay <span aria-hidden="true">↗</span></a><a href="#cach-dung" class="btn btn-outline">Khám phá cách dùng <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-trust"><span class="trust-mark">✧</span><span>Chủ động chọn lá bài</span><i></i><span>Riêng tư trên trình duyệt</span><i></i><span>Không phán xét</span></div>
+      </div>
+      <div class="hero-art" aria-label="Minh họa bộ ba lá Tarot">
+        <div class="orbit orbit-outer" aria-hidden="true"></div><div class="orbit orbit-inner" aria-hidden="true"></div>
+        <span class="floating-spark spark-one" aria-hidden="true">✧</span><span class="floating-spark spark-two" aria-hidden="true">✦</span><span class="floating-spark spark-three" aria-hidden="true">·</span>
+        <div class="hero-card hero-card-left" aria-hidden="true"><span class="card-frame"><span class="tarot-mini-sun">☼</span><span>THE SUN</span></span></div>
+        <div class="hero-card hero-card-middle" aria-hidden="true"><span class="card-frame"><span class="tarot-moon">☾</span><span class="card-line"></span><span class="card-logo">M</span><span class="card-line"></span><span class="card-small">MOONLIT TAROT</span></span></div>
+        <div class="hero-card hero-card-right" aria-hidden="true"><span class="card-frame"><span class="tarot-mini-star">✳</span><span>THE STAR</span></span></div>
+        <div class="art-caption"><span class="dot-live"></span> Một chút tò mò, một chút tĩnh lặng.</div>
+      </div>
+    </section>
+
+    <section class="experience-section" id="trai-bai" aria-labelledby="reading-title">
+      <div class="container">
+        <div class="section-intro centered"><p class="kicker">✦ TRẢI NGHIỆM TƯƠNG TÁC</p><h2 id="reading-title">Hôm nay, bạn muốn <em>hỏi điều gì?</em></h2><p>Chọn một câu hỏi, để trực giác dẫn lối. Đây là bản demo hoạt động ngay trên thiết bị của bạn.</p></div>
+        <div class="reading-shell">
+          <div class="reading-topline"><span class="status"><span class="dot-live"></span> PHIÊN TRẢI BÀI CỦA BẠN</span><span class="step-label" id="step-label">BƯỚC 01 / 03</span></div>
+          <div class="question-wrap" id="question-wrap">
+            <label for="question" class="field-title"><span class="step-index">01</span> Điều gì đang ở trong tâm trí bạn?</label>
+            <textarea id="question" rows="2" maxlength="250" placeholder="Ví dụ: Mình nên nhìn nhận thay đổi sắp tới như thế nào?"></textarea>
+            <div class="question-bottom"><span>Câu hỏi mở thường cho bạn nhiều góc nhìn hơn.</span><span id="char-count">0/250</span></div>
+            <div class="prompt-chips" aria-label="Câu hỏi gợi ý"><button type="button" data-question="Mình có thể chăm sóc một mối quan hệ tốt hơn như thế nào?">♡ Mối quan hệ</button><button type="button" data-question="Mình có thể phát triển bản thân trong giai đoạn này ra sao?">✧ Bản thân</button><button type="button" data-question="Mình nên nhìn nhận một lựa chọn sắp tới như thế nào?">☼ Lựa chọn</button></div>
+          </div>
+          <div class="reading-divider"></div>
+          <div class="deck-heading"><div><h3><span class="step-index">02</span> Hãy chọn 3 lá bài</h3><p>Chạm vào bất kỳ ba lá. Mỗi lá mở ra một góc nhìn khác nhau.</p></div><div class="selection-count" id="selection-count" aria-live="polite"><b>0</b><span> / 3 LÁ ĐÃ CHỌN</span></div></div>
+          <div class="deck" id="deck" aria-label="Bộ bài để lựa chọn"></div>
+          <div class="draw-actions"><button class="btn btn-outline btn-small" id="shuffle" type="button">⤨ Xáo bài lại</button><button class="btn btn-soft btn-small" id="random-pick" type="button">✧ Tùy duyên chọn 3 lá</button><button class="btn btn-gold" id="reveal" type="button" disabled>Lật bài <span aria-hidden="true">↗</span></button></div>
+          <div class="card-slots" id="card-slots" aria-label="Ba vị trí trải bài"><div class="slot"><span class="slot-visual" data-slot="0">✧</span><span class="slot-caption">01 / QUÁ KHỨ</span></div><div class="slot"><span class="slot-visual" data-slot="1">✧</span><span class="slot-caption">02 / HIỆN TẠI</span></div><div class="slot"><span class="slot-visual" data-slot="2">✧</span><span class="slot-caption">03 / TƯƠNG LAI</span></div></div>
+          <section class="reading-results hidden" id="reading-results" aria-labelledby="result-title">
+            <div class="result-divider"><span>✦ DIỄN GIẢI BA LÁ ✦</span></div><h3 id="result-title">Một cách nhìn khác về câu chuyện của bạn</h3><p class="result-question" id="result-question"></p>
+            <div class="result-grid" id="result-grid"></div>
+            <div class="summary-panel"><div class="summary-icon">☾</div><div><h4>Lời nhắn từ bộ bài</h4><p id="summary-text"></p><p class="micro-disclaimer">Diễn giải mẫu được tạo bằng JavaScript, không phải phản hồi từ AI hoặc dự đoán tương lai.</p></div></div>
+            <div class="followup"><div class="followup-heading"><span>✧</span><div><h4>Tiếp tục suy ngẫm</h4><p>Một vài gợi ý trong demo để bạn đào sâu câu hỏi.</p></div></div><div class="chat-messages" id="chat-messages" aria-live="polite"><div class="chat-bubble assistant-bubble">Bạn muốn làm rõ thêm khía cạnh nào? Mình có thể gợi ý một câu hỏi phản tư nhỏ.</div></div><form id="followup-form" class="followup-form"><label for="followup-input" class="sr-only">Câu hỏi tiếp theo</label><input type="text" id="followup-input" maxlength="180" placeholder="Viết điều bạn muốn tìm hiểu thêm…" required><button type="submit" aria-label="Gửi câu hỏi">➜</button></form></div>
+            <button type="button" class="restart" id="restart">↻ Bắt đầu trải bài mới</button>
+          </section>
+        </div>
+        <p class="section-footnote">Tarot được sử dụng như công cụ gợi mở suy nghĩ, không thay thế sự hỗ trợ chuyên môn về sức khỏe, pháp lý hoặc tài chính.</p>
+      </div>
+    </section>
+
+    <section class="features container" id="tinh-nang"><div class="section-intro split-intro"><div><p class="kicker">✧ MỌI THỨ ĐƯỢC THIẾT KẾ CHO BẠN</p><h2>Nhẹ nhàng, riêng tư<br>và <em>thật dễ bắt đầu.</em></h2></div><p>Không có những lời khẳng định chắc chắn về số phận. Chỉ có một không gian để đặt câu hỏi, lắng nghe và kết nối.</p></div><div class="feature-grid"><article class="feature-card"><span class="feature-icon">☽</span><h3>Tự tay chọn bài</h3><p>Chọn ba lá trong bộ bài đang xáo. Bạn quyết định nhịp độ trải nghiệm của mình.</p><span class="feature-no">01 — 04</span></article><article class="feature-card"><span class="feature-icon">✧</span><h3>Không gian riêng tư</h3><p>Bản demo hoạt động ngay trong trình duyệt, không gửi câu hỏi tới máy chủ.</p><span class="feature-no">02 — 04</span></article><article class="feature-card"><span class="feature-icon">✳</span><h3>Gợi mở thay vì phán xét</h3><p>Mỗi diễn giải hướng đến suy ngẫm và những hành động nhỏ do chính bạn lựa chọn.</p><span class="feature-no">03 — 04</span></article><article class="feature-card"><span class="feature-icon">♡</span><h3>Kết nối với Reader</h3><p>Khám phá giao diện chọn hình thức trò chuyện và lịch đặt mẫu dành cho Reader.</p><span class="feature-no">04 — 04</span></article></div></section>
+
+    <section class="reader-section" id="reader"><div class="container"><div class="section-intro split-intro"><div><p class="kicker">✦ KẾT NỐI</p><h2>Một người lắng nghe.<br><em>Một cuộc trò chuyện.</em></h2></div><p>Danh sách bên dưới là nhân vật minh họa cho giao diện tìm kiếm và đặt lịch. Không có lịch hẹn hoặc thanh toán thật.</p></div><div class="reader-toolbar"><span>Khám phá Reader mẫu</span><div class="reader-filters" aria-label="Lọc Reader"><button type="button" class="active" data-filter="all">Tất cả</button><button type="button" data-filter="self">Bản thân</button><button type="button" data-filter="relation">Mối quan hệ</button><button type="button" data-filter="career">Định hướng</button></div></div><div class="reader-grid" id="reader-grid">
+      <article class="reader-card" data-tags="self relation"><div class="reader-portrait portrait-one"><span>☾</span><small>MOONLIT / 01</small></div><div class="reader-details"><div class="reader-role">READER MINH HỌA <span>✦ Trò chuyện</span></div><h3>An Nhiên</h3><p>Khám phá cảm xúc · Mối quan hệ</p><div class="reader-meta"><span>◷ 30 phút</span><span>◇ Text chat</span></div><button class="reader-book" type="button" data-reader="An Nhiên">Xem lịch mẫu <span>↗</span></button></div></article>
+      <article class="reader-card" data-tags="career self"><div class="reader-portrait portrait-two"><span>✳</span><small>MOONLIT / 02</small></div><div class="reader-details"><div class="reader-role">READER MINH HỌA <span>✦ Trò chuyện</span></div><h3>Minh Khuê</h3><p>Định hướng · Phát triển bản thân</p><div class="reader-meta"><span>◷ 45 phút</span><span>◇ Text chat</span></div><button class="reader-book" type="button" data-reader="Minh Khuê">Xem lịch mẫu <span>↗</span></button></div></article>
+      <article class="reader-card" data-tags="relation self"><div class="reader-portrait portrait-three"><span>✧</span><small>MOONLIT / 03</small></div><div class="reader-details"><div class="reader-role">READER MINH HỌA <span>✦ Trò chuyện</span></div><h3>Hạ Lam</h3><p>Kết nối · Lắng nghe cảm xúc</p><div class="reader-meta"><span>◷ 30 phút</span><span>◇ Text chat</span></div><button class="reader-book" type="button" data-reader="Hạ Lam">Xem lịch mẫu <span>↗</span></button></div></article>
+      <article class="reader-card" data-tags="career self"><div class="reader-portrait portrait-four"><span>☼</span><small>MOONLIT / 04</small></div><div class="reader-details"><div class="reader-role">READER MINH HỌA <span>✦ Trò chuyện</span></div><h3>Thanh Vân</h3><p>Suy ngẫm · Những ngã rẽ</p><div class="reader-meta"><span>◷ 45 phút</span><span>◇ Text chat</span></div><button class="reader-book" type="button" data-reader="Thanh Vân">Xem lịch mẫu <span>↗</span></button></div></article>
+      </div></div></section>
+
+    <section class="how-section container" id="cach-dung"><div class="section-intro centered"><p class="kicker">✧ CÁCH DÙNG</p><h2>Chỉ vài bước, <em>thật giản đơn.</em></h2><p>Hành trình nhỏ bắt đầu bằng sự tò mò của chính bạn.</p></div><div class="how-grid"><article><span class="how-num">01<span>✦</span></span><h3>Đặt câu hỏi</h3><p>Nhập điều bạn muốn suy ngẫm hoặc chọn một câu hỏi gợi ý.</p></article><article><span class="how-num">02<span>☾</span></span><h3>Chọn ba lá</h3><p>Tự chọn từng lá, hoặc để bộ bài chọn ngẫu nhiên cho bạn.</p></article><article><span class="how-num">03<span>✧</span></span><h3>Lật & khám phá</h3><p>Đọc diễn giải Quá khứ – Hiện tại – Tương lai và lời nhắn tổng kết.</p></article><article><span class="how-num">04<span>♡</span></span><h3>Tiếp tục suy ngẫm</h3><p>Thử một câu hỏi tiếp nối hoặc khám phá giao diện Reader mẫu.</p></article></div></section>
+
+    <section class="quote-band"><div class="container"><span class="quote-symbol">“</span><blockquote>Không phải mọi câu trả lời đều nằm trong những lá bài.<br>Đôi khi, chúng chỉ giúp ta <em>nghe rõ chính mình hơn.</em></blockquote><div class="quote-bottom">✦ MOONLIT TAROT <span>—</span> MỘT KHOẢNG LẶNG CHO BẠN</div></div></section>
+
+    <section class="faq-section container" id="faq"><div class="section-intro split-intro"><div><p class="kicker">✧ GIẢI ĐÁP</p><h2>Một vài điều<br><em>bạn có thể tò mò.</em></h2></div><p>Mọi thứ nên rõ ràng ngay từ đầu. Dưới đây là một số thông tin về cách bản demo hoạt động.</p></div><div class="faq-list"><details><summary>Trải bài có dự đoán chính xác tương lai không?<span>+</span></summary><p>Không. Đây là trải nghiệm suy ngẫm thông qua biểu tượng Tarot. Nội dung diễn giải không khẳng định điều gì chắc chắn sẽ xảy ra.</p></details><details><summary>Bản demo có dùng AI thật không?<span>+</span></summary><p>Chưa. Phần chọn bài, diễn giải và phản hồi tiếp nối hiện chạy bằng JavaScript ngay trên trình duyệt. Muốn tích hợp AI thật cần thêm API backend an toàn.</p></details><details><summary>Câu hỏi của tôi có được lưu lại không?<span>+</span></summary><p>Không. Phiên bản hiện tại không gửi hay lưu câu hỏi lên máy chủ. Tải lại trang là trạng thái trải bài sẽ được đặt lại.</p></details><details><summary>Tôi có thể đặt lịch với Reader trên bản này không?<span>+</span></summary><p>Bạn có thể thử giao diện chọn Reader, ngày và giờ, nhưng nút xác nhận chỉ mô phỏng thao tác. Chưa tích hợp tài khoản, lịch hẹn, tin nhắn hoặc thanh toán thực.</p></details></div></section>
+
+    <section class="last-cta container"><div class="cta-stars" aria-hidden="true">✧ &nbsp; ✦ &nbsp; ☾</div><p class="kicker">HÀNH TRÌNH BẮT ĐẦU TỪ MỘT CÂU HỎI</p><h2>Cho mình một khoảng lặng,<br>và <em>bắt đầu nhé.</em></h2><a href="#trai-bai" class="btn btn-gold">✦ Trải bài miễn phí <span>↗</span></a></section>
+  </main>
+  <footer class="footer"><div class="container footer-top"><div><a class="brand" href="#dau-trang"><span class="brand-symbol">✦</span><span>moonlit<span class="brand-dot">.</span><small>TAROT STUDIO</small></span></a><p>Không gian gợi mở suy nghĩ qua ngôn ngữ của những lá bài.</p></div><div class="footer-links"><a href="#trai-bai">Trải bài</a><a href="#reader">Reader mẫu</a><a href="#cach-dung">Cách sử dụng</a><a href="#faq">FAQ</a></div></div><div class="container footer-bottom"><span>© <span id="year"></span> Moonlit Tarot · Demo độc lập lấy cảm hứng từ mô hình web Tarot.</span><span>Không liên kết với Stick Tarot · Không cung cấp lời khuyên chuyên môn.</span></div></footer>
+
+  <dialog class="booking-dialog" id="booking-dialog" aria-labelledby="booking-title"><form method="dialog" class="modal-content"><div class="modal-top"><span class="kicker">✦ ĐẶT LỊCH DEMO</span><button type="button" id="close-booking" class="close-modal" aria-label="Đóng">×</button></div><h2 id="booking-title">Trò chuyện cùng <span id="booking-name">Reader</span></h2><p>Thử chọn ngày và thời gian. Không tạo cuộc hẹn thật hoặc yêu cầu thông tin cá nhân.</p><label for="booking-date">Ngày minh họa</label><input type="date" id="booking-date" required><label>Khung giờ mẫu</label><div class="time-slots" id="time-slots"><button type="button" data-time="09:00">09:00</button><button type="button" data-time="11:00">11:00</button><button type="button" data-time="14:00">14:00</button><button type="button" data-time="16:00">16:00</button><button type="button" data-time="19:00">19:00</button><button type="button" data-time="20:30">20:30</button></div><button id="booking-confirm" class="btn btn-gold" type="button" disabled>Chọn một khung giờ</button><p class="booking-message" id="booking-message" role="status"></p></form></dialog>
+</body>
+</html>

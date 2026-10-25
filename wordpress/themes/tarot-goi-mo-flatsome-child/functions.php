@@ -1,0 +1,5 @@
+<?php
+if(!defined('ABSPATH'))exit;
+add_action('wp_enqueue_scripts',function(){wp_enqueue_style('tgm-flatsome-child',get_stylesheet_uri(),array(),wp_get_theme()->get('Version'));},20);
+add_filter('body_class',function($classes){$ids=get_option('tgm_page_ids',array());if(is_front_page()||is_singular('tgm_tarot_card')||(is_page()&&in_array(get_queried_object_id(),array_values($ids)))||(is_single()&&has_category('tarot')))$classes[]='tgm-site';return $classes;});
+add_action('flatsome_footer',function(){if(!function_exists('tgm_pages'))return;$pages=tgm_pages();echo '<div class="tgm-footer"><strong>Tarot Gợi Mở</strong><p>Bói bài miễn phí · Không cần đăng nhập · Bạn là người lựa chọn hướng đi.</p><p><a href="'.esc_url($pages['three']).'">Trải bài 3 lá</a> · <a href="'.esc_url($pages['daily']).'">Tarot hôm nay</a> · <a href="'.esc_url($pages['library']).'">78 lá bài</a></p><small>Luận giải dùng để chiêm nghiệm, không thay thế tư vấn y tế, pháp lý hoặc tài chính. Nhật ký lưu trên thiết bị. Khi bạn chọn AI, câu hỏi và các lá sẽ được gửi tới nhà cung cấp API do website cấu hình.</small></div>';},20);
